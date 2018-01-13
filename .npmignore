@@ -1,0 +1,13 @@
+/dist/test.d.ts
+/dist/test.js
+/node_modules/
+/test/
+/.gitignore
+/.npmignore
+cb.ts
+test.ts
+/tsconfig.json
+/tslint.json
+/.git/
+/.vscode/
+/docs/

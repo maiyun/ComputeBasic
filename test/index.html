@@ -1,0 +1,60 @@
+<!DOCTYPE HTML>
+<html>
+	<head>
+        <title>ComputeBasic Test</title>
+        <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
+        <script src="../dist/cb.js"></script>
+        <script src="../dist/test.js"></script>
+        <style>
+            body{margin: 10px;}
+
+            .box{border: solid 1px #000; min-height: 50px; padding: 10px; box-sizing: border-box;}
+            .line{margin-top: 10px;}
+            .flex{display: flex;}
+            .flex > div{flex: 1;}
+        </style>
+	</head>
+	<body>
+        <div class="flex">
+            <div>
+                Compute Basic Code:
+                <div class="line">
+                    <textarea id="code" style="width: 100%; height: 250px;" class="box"></textarea>
+                </div>
+                <div class="line">
+                    <input id="compilerBtn" type="button" value="Compile">
+                </div>
+            </div>
+            <div style="margin-left: 10px;">
+                UI:
+                <div class="box line" style="height: 250px;">
+                    <div>
+                        Input name is "a":
+                    </div>
+                    <div class="line">
+                        <input name="a" value="-43">
+                    </div>
+                    <div class="line">
+                        Input name is "b":
+                    </div>
+                    <div class="line">
+                        <input name="b" value="-14">
+                    </div>
+                    <div class="line">
+                        Result: <span id="uiResult">0</span>
+                    </div>
+                </div>
+                <div class="line">
+                    <input id="crunBtn" type="button" value="Compile and run"><input id="runBtn" type="button" value="Only run" style="margin-left: 10px;">
+                </div>
+            </div>
+        </div>
+        <div class="line">
+            Result:
+        </div>
+        <div id="result" class="box line">
+
+        </div>
+	</body>
+</html>

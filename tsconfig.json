@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "module": "commonjs",
+        "removeComments": true,
+        "preserveConstEnums": true,
+        "outDir": "dist/",
+        "sourceMap": false,
+        "target": "es5",
+        "strict": true,
+        "declaration": true, // d.ts
+        "newLine": "LF"
+    }
+}

@@ -1,6 +1,6 @@
 # ComputeBasic
 
-[![License](https://img.shields.io/github/license/mashape/apistatus.svg)](https://github.com/litert/http/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/yunbookf/ComputeBasic.svg)](https://github.com/litert/http/blob/master/LICENSE)
 [![GitHub issues](https://img.shields.io/github/issues/yunbookf/ComputeBasic.svg)](https://github.com/yunbookf/ComputeBasic/issues)
 [![GitHub Releases](https://img.shields.io/github/release/yunbookf/ComputeBasic.svg)](https://github.com/yunbookf/ComputeBasic/releases "Stable Release")
 [![GitHub Pre-Releases](https://img.shields.io/github/release/yunbookf/ComputeBasic/all.svg)](https://github.com/yunbookf/ComputeBasic/releases "Pre-Release")
@@ -9,17 +9,22 @@ ComputeBasic is a simple scripting language for amateurs, compiled as JavaScript
 
 # Installation
 
-## Direct <script> Include
+## Systemjs
 
-Simply download and include with a script tag. ComputeBasic will be registered as a global variable.
-
-> Don’t use the minified version during development. You will miss out on all the nice warnings for common mistakes!
+You need to reference Systemjs first and then import the index.js file like this:
 
 ```html
-<!-- Development Version -->
-<script src="cb.js"></script>
-<!-- Production Version -->
-<script src="cb.min.js"></script>
+<script src="//cdn.jsdelivr.net/npm/systemjs@0/dist/system.js"></script>
+<script>
+    SystemJS.config({
+        packages: {
+            './dist': {
+                defaultExtension: 'js'
+            }
+        }
+    });
+    SystemJS.import('./dist/index');
+</script>
 ```
 
 ### CDN
@@ -42,6 +47,10 @@ Or install the developing (unstable) version for newest features:
 $ npm i computebasic@dev --save
 ```
 
-## License
+# Test
+
+Test in the browser, visit "test/index.html". Test in Nodejs, please execute "node test.node.js" in the "dist" directory.
+
+# License
 
 This library is published under [Apache-2.0](./LICENSE) license.

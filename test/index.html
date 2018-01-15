@@ -3,9 +3,18 @@
 	<head>
         <title>ComputeBasic Test</title>
         <meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+        <script src="//cdn.jsdelivr.net/npm/systemjs@0/dist/system.js"></script>
         <script src="//cdn.jsdelivr.net/npm/jquery@3/dist/jquery.min.js"></script>
-        <script src="../dist/cb.js"></script>
-        <script src="../dist/test.js"></script>
+        <script>
+            SystemJS.config({
+                packages: {
+                    '../dist': {
+                        defaultExtension: 'js'
+                    }
+                }
+            });
+            SystemJS.import('../dist/test');
+        </script>
         <style>
             body{margin: 10px;}
 
@@ -53,8 +62,6 @@
         <div class="line">
             Result:
         </div>
-        <div id="result" class="box line">
-
-        </div>
+        <div id="result" class="box line"></div>
 	</body>
 </html>

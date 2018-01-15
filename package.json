@@ -2,7 +2,7 @@
   "name": "computebasic",
   "version": "0.0.1",
   "description": "ComputeBasic is a simple scripting language for amateurs, compiled as JavaScript.",
-  "main": "dist/cb.js",
+  "main": "dist/index.js",
   "author": "HanGuoShuai",
   "license": "Apache-2.0"
 }

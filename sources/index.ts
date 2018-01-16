@@ -3,6 +3,7 @@
  * Author: HanGuoShuai
  * Github: https://github.com/MaiyunNET/ComputeBasic
  */
+
 import * as Abstracts from "./Abstract";
 import TokenizerCreate from "./Tokenizer";
 import Language from "./Language";

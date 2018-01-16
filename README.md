@@ -2,11 +2,11 @@
 
 [![npm version](https://img.shields.io/npm/v/computebasic.svg?colorB=brightgreen)](https://www.npmjs.com/package/computebasic "Stable Version")
 [![npm version](https://img.shields.io/npm/v/computebasic/dev.svg)](https://www.npmjs.com/package/computebasic "Development Version")
-[![License](https://img.shields.io/github/license/yunbookf/ComputeBasic.svg)](https://github.com/litert/http/blob/master/LICENSE)
+[![License](https://img.shields.io/github/license/MaiyunNET/ComputeBasic.svg)](https://github.com/MaiyunNET/ComputeBasic/blob/master/LICENSE)
 [![node](https://img.shields.io/node/v/computebasic.svg?colorB=brightgreen)](https://nodejs.org/dist/latest-v8.x/)
-[![GitHub issues](https://img.shields.io/github/issues/yunbookf/ComputeBasic.svg)](https://github.com/yunbookf/ComputeBasic/issues)
-[![GitHub Releases](https://img.shields.io/github/release/yunbookf/ComputeBasic.svg)](https://github.com/yunbookf/ComputeBasic/releases "Stable Release")
-[![GitHub Pre-Releases](https://img.shields.io/github/release/yunbookf/ComputeBasic/all.svg)](https://github.com/yunbookf/ComputeBasic/releases "Pre-Release")
+[![GitHub issues](https://img.shields.io/github/issues/MaiyunNET/ComputeBasic.svg)](https://github.com/MaiyunNET/ComputeBasic/issues)
+[![GitHub Releases](https://img.shields.io/github/release/MaiyunNET/ComputeBasic.svg)](https://github.com/MaiyunNET/ComputeBasic/releases "Stable Release")
+[![GitHub Pre-Releases](https://img.shields.io/github/release/MaiyunNET/ComputeBasic/all.svg)](https://github.com/MaiyunNET/ComputeBasic/releases "Pre-Release")
 
 ComputeBasic is a simple scripting language for amateurs, compiled as JavaScript.
 

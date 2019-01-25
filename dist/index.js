@@ -296,10 +296,10 @@ var ComputeBasic = (function () {
     };
     ComputeBasic.prototype._error = function (code, tr) {
         if (tr.token) {
-            alert(this._lang.error + ":\n" + this._lang.code + ": " + code + "\n" + this._lang.message + ": " + this._lang.codeMessage[code] + "\n" + this._lang.word + "\uFF1A" + tr.token.text + "\n" + this._lang.row + ": " + tr.row + "\n" + this._lang.col + ": " + tr.col);
+            throw new Error(this._lang.error + ":\n" + this._lang.code + ": " + code + "\n" + this._lang.message + ": " + this._lang.codeMessage[code] + "\n" + this._lang.word + "\uFF1A" + tr.token.text + "\n" + this._lang.row + ": " + tr.row + "\n" + this._lang.col + ": " + tr.col);
         }
         else {
-            alert(this._lang.error + ":\n" + this._lang.code + ": " + code + "\n" + this._lang.message + ": " + this._lang.codeMessage[code] + "\n" + tr);
+            throw new Error(this._lang.error + ":\n" + this._lang.code + ": " + code + "\n" + this._lang.message + ": " + this._lang.codeMessage[code] + "\n" + tr);
         }
     };
     return ComputeBasic;
@@ -307,5 +307,4 @@ var ComputeBasic = (function () {
 function create() {
     return new ComputeBasic();
 }
-exports.create = create;
 exports.default = create;

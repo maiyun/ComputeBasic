@@ -1,6 +1,6 @@
 /*
  * ComputeBasic 0.0.1
- * Author: HanGuoShuai
+ * Author: Han Guoshuai
  * Github: https://github.com/MaiyunNET/ComputeBasic
  */
 
@@ -9,6 +9,7 @@ export enum TOKEN_TYPES {
     UNKNOWN,
     SYMBOL,
     STRING,
+    FULL_STRING,
     COMMENT,
     DEC_NUMBER,
     HEX_NUMBER,
@@ -16,8 +17,7 @@ export enum TOKEN_TYPES {
     REAL_NUMBER,
     BIN_NUMBER,
     REGEXP,
-    IDENTITY,
-    ELEMENT
+    IDENTITY
 }
 
 // --- 每个 token 的类型 ---
@@ -35,7 +35,7 @@ export interface TokenRefer {
 
 // --- 编译选项 ---
 export interface CompileOption {
-    string: boolean;
+    outType?: string;
 }
 
 export interface LanguageEntity {
@@ -49,8 +49,8 @@ export interface LanguageEntity {
 }
 
 export interface LanguageRefer {
-    enUs: LanguageEntity;
-    zhCn: LanguageEntity;
+    en: LanguageEntity;
+    zhCN: LanguageEntity;
 }
 
 // --- 类 ---
@@ -61,6 +61,7 @@ export interface Tokenizer {
 export interface ComputeBasic {
     expose(funName: string, fun: (...args: any[]) => {}): void;
     setLanguage(lang: string): void;
-    compiler(code: string, opt?: CompileOption): boolean | Function | string;
+    compile(code: string, opt?: CompileOption): any;
+    compileToString(code: string): string;
 }
 

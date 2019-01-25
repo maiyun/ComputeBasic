@@ -21,9 +21,7 @@ var code = [
     "return ceil(result)"
 ].join("\n");
 console.log("---------- CB Code ----------\n" + code);
-var res = cb.compiler(code, {
-    string: true
-});
+var res = cb.compileToString(code);
 console.log("---------- Compiler result ----------\n" + res);
 var fun = new Function(res);
 console.log("---------- Run result ----------");

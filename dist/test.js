@@ -2,47 +2,20 @@
 Object.defineProperty(exports, "__esModule", { value: true });
 var ComputeBasic = require("./index");
 $(document).ready(function () {
-    $("#code").val([
-        "if [a] > 0 then",
-        "    result = [a] * [b]",
-        "ElSeIf [a] < 0 then",
-        "    if [b] > 0 then",
-        "        result = [a] / [b]     'This is comment",
-        "    else",
-        "        result = [a] * 31.32",
-        "    End If",
-        "else if a = 0 Then",
-        "    ' --- a = 0 ---",
-        "    result = \"This is \"\"string\"\", haha.\"",
-        "end if",
-        "",
-        "return ceil(result)"
-    ].join("\n"));
+    $("#code").val("av = v(\"a\")\nbv = v(\"b\")\n\nif av > 0 then\n    result = av * bv\nelseif av < 0 then\n    if bv > 0 then\n        result = av / bv     'This is comment\n    else\n        result = av * rand(5, 15)\n    End If\nelse if av = 0 Then\n    ' --- a = 0 ---\n    result = \"This is \"\"string\"\", haha.\"\nend if\n\nIf type(result) <> \"string\" Then\n    result = ceil(result)\nEnd If\n\nreturn result");
     var $code = $("#code");
     var $result = $("#result");
     var $uiResult = $("#uiResult");
     var cb = ComputeBasic.create();
-    var fun = false;
     $("#compilerBtn").on("click", function () {
-        var res = cb.compiler($code.val(), {
-            string: true
-        });
+        var res = cb.compileToString($code.val());
         $result.text(res);
     });
-    $("#runBtn").on("click", function () {
-        if (fun !== false) {
-            var r = fun();
-            $uiResult.html(r);
-        }
-        else {
-            alert("Please click \"Compile and run\" first.");
-        }
-    });
     $("#crunBtn").on("click", function () {
-        fun = cb.compiler($code.val());
+        var fun = cb.compile($code.val());
         if (fun !== false) {
-            var r = fun();
-            $uiResult.html(r);
+            var result = fun();
+            $uiResult.html(result);
         }
     });
 });

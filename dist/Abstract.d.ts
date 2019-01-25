@@ -2,15 +2,15 @@ export declare enum TOKEN_TYPES {
     UNKNOWN = 0,
     SYMBOL = 1,
     STRING = 2,
-    COMMENT = 3,
-    DEC_NUMBER = 4,
-    HEX_NUMBER = 5,
-    OCT_NUMBER = 6,
-    REAL_NUMBER = 7,
-    BIN_NUMBER = 8,
-    REGEXP = 9,
-    IDENTITY = 10,
-    ELEMENT = 11,
+    FULL_STRING = 3,
+    COMMENT = 4,
+    DEC_NUMBER = 5,
+    HEX_NUMBER = 6,
+    OCT_NUMBER = 7,
+    REAL_NUMBER = 8,
+    BIN_NUMBER = 9,
+    REGEXP = 10,
+    IDENTITY = 11
 }
 export interface TokenEntity {
     readonly "text": string;
@@ -23,7 +23,7 @@ export interface TokenRefer {
     readonly "col": number;
 }
 export interface CompileOption {
-    string: boolean;
+    outType?: string;
 }
 export interface LanguageEntity {
     error: string;
@@ -35,8 +35,8 @@ export interface LanguageEntity {
     codeMessage: any;
 }
 export interface LanguageRefer {
-    enUs: LanguageEntity;
-    zhCn: LanguageEntity;
+    en: LanguageEntity;
+    zhCN: LanguageEntity;
 }
 export interface Tokenizer {
     tokenize(code: string): TokenRefer[];
@@ -44,5 +44,6 @@ export interface Tokenizer {
 export interface ComputeBasic {
     expose(funName: string, fun: (...args: any[]) => {}): void;
     setLanguage(lang: string): void;
-    compiler(code: string, opt?: CompileOption): boolean | Function | string;
+    compile(code: string, opt?: CompileOption): any;
+    compileToString(code: string): string;
 }

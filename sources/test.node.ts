@@ -1,6 +1,6 @@
 /*
- * ComputeBasic 0.0.1
- * Author: HanGuoShuai
+ * ComputeBasic
+ * Author: Han Guoshuai
  * Github: https://github.com/MaiyunNET/ComputeBasic
  */
 
@@ -29,9 +29,7 @@ let code: string = [
 
 console.log("---------- CB Code ----------\n" + code);
 
-let res = <string>cb.compiler(code, {
-    string: true
-});
+let res = cb.compileToString(code);
 
 console.log("---------- Compiler result ----------\n" + res);
 

@@ -1,7 +1,7 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Language = {
-    enUs: {
+    en: {
         "error": "CB Error",
         "code": "Code",
         "message": "Message",
@@ -17,7 +17,7 @@ exports.Language = {
             5: "Unrecognized operator"
         }
     },
-    zhCn: {
+    zhCN: {
         "error": "CB 执行错误",
         "code": "错误码",
         "message": "错误信息",

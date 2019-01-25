@@ -1,13 +1,13 @@
 /*
- * ComputeBasic 0.0.1
- * Author: HanGuoShuai
+ * ComputeBasic
+ * Author: Han Guoshuai
  * Github: https://github.com/MaiyunNET/ComputeBasic
  */
 
 import * as Abstracts from "./Abstract";
 
 export const Language: Abstracts.LanguageRefer = {
-    enUs: {
+    en: {
         "error": "CB Error",
         "code": "Code",
         "message": "Message",
@@ -23,7 +23,7 @@ export const Language: Abstracts.LanguageRefer = {
             5: "Unrecognized operator"
         }
     },
-    zhCn: {
+    zhCN: {
         "error": "CB 执行错误",
         "code": "错误码",
         "message": "错误信息",

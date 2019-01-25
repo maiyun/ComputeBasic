@@ -1,5 +1,8 @@
+/.git/
+/.vscode/
 /dist/test.d.ts
 /dist/test.js
+/doc/
 /node_modules/
 /sources/test.ts
 /test/
@@ -7,6 +10,3 @@
 /.npmignore
 /tsconfig.json
 /tslint.json
-/.git/
-/.vscode/
-/docs/

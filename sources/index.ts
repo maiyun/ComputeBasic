@@ -1,6 +1,6 @@
 /*
- * ComputeBasic 0.0.1
- * Author: HanGuoShuai
+ * ComputeBasic
+ * Author: Han Guoshuai
  * Github: https://github.com/MaiyunNET/ComputeBasic
  */
 
@@ -9,61 +9,87 @@ import TokenizerCreate from "./Tokenizer";
 import Language from "./Language";
 
 enum Status {
+    /** 就绪状态 */
     READY,
-    ASSIGN_SYMBOL,
-    ASSIGN_IDENTITY,
-    IF
+    /** 发现 if */
+    IF,
+    /** 等待运算符 */
+    WAIT_OPER,
+    /** 进入函数体 */
+    IN_FUNC
 }
 
 class ComputeBasic {
 
+    /** 默认语言 */
     private _lang: Abstracts.LanguageEntity;
+    /** 分离器 */
     private _tokenizer: Abstracts.Tokenizer;
+    /** 内置函数 */
     private _funList: any = {
-        "abs": (n: number) => {return Math.abs(n); },
-        "ceil": (n: number) => {return Math.ceil(n); },
-        "floor": (n: number) => {return Math.floor(n); },
-        "round": (n: number) => {return Math.round(n); },
-        "int": (s: string) => {return parseInt(s); },
-        "float": (s: string) => {return parseFloat(s); },
-        "string": (n: number) => {return n.toString(); }
+        "abs": (n: number): number => {return Math.abs(n); },
+        "ceil": (n: number): number => {return Math.ceil(n); },
+        "floor": (n: number): number => {return Math.floor(n); },
+        "round": (n: number): number => {return Math.round(n); },
+        "int": (s: string): number => {return parseInt(s); },
+        "float": (s: string): number => {return parseFloat(s); },
+        "string": (n: number): string => {return n.toString(); },
+        "rand": (x: number, n: number): number => {return n + Math.round(Math.random() * (x - n)); },
+        "type": (x: any): string => {return typeof(x); } ,
+        "v": (d: string): string => {return (<HTMLInputElement>document.getElementsByName(d)[0]).value; },
+        "$": (d: string): HTMLElement => {return document.getElementsByName(d)[0]; }
     };
 
     public constructor() {
         this._tokenizer = TokenizerCreate();
-        this._lang = Language.enUs;
+        this._lang = Language.en;
     }
 
-    public expose(funName: string, fun: (...args: any[]) => {}): void {
+    // --- 从外部内置函数 ---
+    public expose(funName: string, fun: (...args: any[]) => any): void {
         this._funList[funName] = fun;
     }
 
+    /**
+     * --- 设置编译器语言 ---
+     * @param lang 语言字符串，如 zh-CN
+     */
     public setLanguage(lang: string): void {
         switch (lang) {
-        case "zh-cn":
-            this._lang = Language.zhCn;
+        case "zh-CN":
+            this._lang = Language.zhCN;
             break;
         default:
-            this._lang = Language.enUs;
+            this._lang = Language.en;
             break;
         }
     }
 
-    public compiler(code: string, opt?: Abstracts.CompileOption): boolean | Function | string {
-        let trs: Abstracts.TokenRefer[] = this._tokenizer.tokenize(code);
+    /**
+     * --- 编译代码 ---
+     * @param code 要编译的代码
+     * @param opt 编译选项
+     */
+    public compile(code: string, opt: Abstracts.CompileOption = {}): any {
+        opt.outType = opt.outType || "function";
+
+        let trs: Abstracts.TokenRefer[] = this._tokenizer.tokenize(code);   // --- 序列化好的 token list ---
         let out: string[] = [];             // --- 编译好的代码 ---
-        let els: string[] = [];             // DOM 列表
-        let vars: string[] = [];            // 变量列表
-        let funs: string[] = [];            // 使用到的函数列表
-        let status: Status = Status.READY;
+        let vars: any = {};                 // --- 变量列表 ---
+        let varsCount: number = -1;         // --- 变量个数 ---
+        let funs: string[] = [];            // --- 使用到的函数列表 ---
+        let status: Status = Status.READY;  // --- 当前状态 ---
+        let inFuncCount: number = 0;        // --- 括号次数 ---
 
         for (let i: number = 0; i < trs.length; ++i) {
             let tr = trs[i];
 
-            if (status === Status.ASSIGN_IDENTITY) {
+            // --- 本 if 主要主要判断是否要补 ; ---
+
+            if (status === Status.READY) {
                 switch (tr.token.type) {
-                case Abstracts.TOKEN_TYPES.IDENTITY:
                 case Abstracts.TOKEN_TYPES.STRING:
+                case Abstracts.TOKEN_TYPES.FULL_STRING:
                 case Abstracts.TOKEN_TYPES.DEC_NUMBER:
                 case Abstracts.TOKEN_TYPES.HEX_NUMBER:
                 case Abstracts.TOKEN_TYPES.OCT_NUMBER:
@@ -71,22 +97,50 @@ class ComputeBasic {
                 case Abstracts.TOKEN_TYPES.BIN_NUMBER:
                 case Abstracts.TOKEN_TYPES.REGEXP:
                 case Abstracts.TOKEN_TYPES.IDENTITY:
-                case Abstracts.TOKEN_TYPES.ELEMENT:
-                    status = Status.ASSIGN_SYMBOL;
-                    break;
-                default:
-                    out.push(";");
-                    status = Status.READY;
+                    // --- 是文本的话，就等待运算符 ---
+                    status = Status.WAIT_OPER;
                     break;
                 }
-            } else if (status === Status.ASSIGN_SYMBOL) {
-                if (tr.token.type === Abstracts.TOKEN_TYPES.SYMBOL) {
-                    status = Status.ASSIGN_IDENTITY;
-                } else {
+            } else if (status === Status.WAIT_OPER) {
+                switch (tr.token.type) {
+                case Abstracts.TOKEN_TYPES.STRING:
+                case Abstracts.TOKEN_TYPES.FULL_STRING:
+                case Abstracts.TOKEN_TYPES.DEC_NUMBER:
+                case Abstracts.TOKEN_TYPES.HEX_NUMBER:
+                case Abstracts.TOKEN_TYPES.OCT_NUMBER:
+                case Abstracts.TOKEN_TYPES.REAL_NUMBER:
+                case Abstracts.TOKEN_TYPES.REGEXP:
+                    // --- 等待运算符的时候出来一堆有的没的，直接报错 ---
+                    this._error(5, tr);
+                    return false;
+                case Abstracts.TOKEN_TYPES.IDENTITY:
                     out.push(";");
-                    status = Status.READY;
+                    status = Status.WAIT_OPER;
+                    break;
+                case Abstracts.TOKEN_TYPES.SYMBOL:
+                    if (tr.token.lower === "(" || tr.token.lower === "（") {
+                        status = Status.IN_FUNC;
+                        ++inFuncCount;
+                        break;
+                    } else {
+                        status = Status.READY;
+                    }
+                }
+            } else if (status === Status.IN_FUNC) {
+                switch (tr.token.type) {
+                case Abstracts.TOKEN_TYPES.SYMBOL:
+                    if (tr.token.lower === ")" || tr.token.lower === "）") {
+                        --inFuncCount;
+                        if (inFuncCount === 0) {
+                            status = Status.WAIT_OPER;
+                        }
+                    }
+                    break;
                 }
             }
+
+            // --- 正常处理 ---
+
             switch (tr.token.type) {
             case Abstracts.TOKEN_TYPES.SYMBOL:
                 switch (tr.token.text) {
@@ -96,7 +150,6 @@ class ComputeBasic {
                     } else {
                         // --- 赋值 ---
                         out.push("=");
-                        status = Status.ASSIGN_IDENTITY;
                     }
                     break;
                 case ">":
@@ -109,7 +162,23 @@ class ComputeBasic {
                 case "-":
                 case "*":
                 case "/":
+                case "[":
+                case "]":
+                case ",":
                     out.push(tr.token.text);
+                    break;
+                case "<>":
+                    out.push("!=");
+                    break;
+                case "（":
+                    out.push("(");
+                    break;
+                case "）":
+                    out.push(")");
+                    break;
+                case "“":
+                case "”":
+                    out.push("\"");
                     break;
                 case "&":
                     out.push("+");
@@ -120,7 +189,10 @@ class ComputeBasic {
                 }
                 break;
             case Abstracts.TOKEN_TYPES.STRING:
-                out.push(tr.token.text.replace(/""/g, "\\\""));
+                out.push(tr.token.text.replace(/""/g, `\\"`));
+                break;
+            case Abstracts.TOKEN_TYPES.FULL_STRING:
+                out.push(`"` + tr.token.text.replace(/"/g, `\\"`).replace(/””/g, `\\"`).slice(1, -1) + `"`);
                 break;
             case Abstracts.TOKEN_TYPES.DEC_NUMBER:
             case Abstracts.TOKEN_TYPES.HEX_NUMBER:
@@ -133,14 +205,18 @@ class ComputeBasic {
             case Abstracts.TOKEN_TYPES.IDENTITY:
                 switch (tr.token.lower) {
                 case "if":
+                case "如果":
                     if (trs[i - 1] && trs[i - 1].token.lower === "end") {
                         out.push("}");
+                        status = Status.READY;
                     } else {
                         out.push("if(");
                         status = Status.IF;
                     }
                     break;
                 case "then":
+                case "那么":
+                case "那麼":
                     if (status === Status.IF) {
                         out.push("){");
                         status = Status.READY;
@@ -150,35 +226,47 @@ class ComputeBasic {
                     }
                     break;
                 case "else":
+                case "其他情况":
+                case "其他情況":
                     if (trs[i + 1] && trs[i + 1].token.lower === "if") {
                         out.push("}else ");
                     } else {
                         out.push("}else{");
                     }
+                    status = Status.READY;
                     break;
                 case "elseif":
+                case "或者":
                     out.push("}else if(");
                     status = Status.IF;
                     break;
                 case "end":
                     // --- 无需额外处理 ---
+                    status = Status.READY;
                     break;
                 case "endif":
+                case "结束如果":
+                case "結束如果":
                     out.push("}");
+                    status = Status.READY;
                     break;
                 case "and":
+                case "和":
                     out.push("&&");
                     break;
                 case "or":
+                case "或":
                     out.push("||");
                     break;
                 case "return":
+                case "返回":
                     out.push("return ");
+                    status = Status.READY;
                     break;
                 default:
                     // --- 函数、变量 ---
                     // --- 如果不是函数，才是变量 ---
-                    if (trs[i + 1] && trs[i + 1].token.text === "(") {
+                    if (trs[i + 1] && ((trs[i + 1].token.text === "(") || (trs[i + 1].token.text === "（"))) {
                         // --- 函数 ---
                         if (this._funList[tr.token.lower]) {
                             out.push(tr.token.lower);
@@ -192,14 +280,16 @@ class ComputeBasic {
                         }
                     } else {
                         // --- 变量 ---
-                        if (/^[\u4e00-\u9fbf_a-z0-9]+$/.test(tr.token.lower)) {
-                            if (vars.indexOf("var_" + tr.token.lower) === -1) {
-                                vars.push("var_" + tr.token.lower);
+                        if (/^[\u4e00-\u9fbf\uac00-\ud7ff\u3040-\u309F\u30A0-\u30FF_a-z0-9$]+$/.test(tr.token.lower)) {
+                            if (vars[tr.token.lower] === undefined) {
+                                vars[tr.token.lower] = "v" + ++varsCount;
                             }
                             if ((trs[i - 1] && trs[i - 1].token.text === "+") || (trs[i + 1] && trs[i + 1].token.text === "+")) {
-                                out.push("parseFloat(var_" + tr.token.lower + ")");
+                                out.push("parseFloat(" + vars[tr.token.lower] + ")");
+                            } else if ((trs[i - 1] && trs[i - 1].token.text === "&") || (trs[i + 1] && trs[i + 1].token.text === "&")) {
+                                out.push(vars[tr.token.lower] + ".toString()");
                             } else {
-                                out.push("var_" + tr.token.lower);
+                                out.push(vars[tr.token.lower]);
                             }
                         } else {
                             // --- 变量名异常/无法识别 ---
@@ -210,29 +300,12 @@ class ComputeBasic {
                     break;
                 }
                 break;
-            case Abstracts.TOKEN_TYPES.ELEMENT:
-                let name = tr.token.text.slice(1, -1);
-                if (els.indexOf(name) === -1) {
-                    els.push(name);
-                }
-                if ((trs[i - 1] && trs[i - 1].token.text === "+") || (trs[i + 1] && trs[i + 1].token.text === "+")) {
-                    out.push("parseFloat(el_" + name + ".value)");
-                } else {
-                    out.push("el_" + name + ".value");
-                }
-                break;
             }
         }
 
         // --- 进行变量注入 ---
-        if (vars.length > 0) {
-            out.splice(0, 0, "var " + vars.join(",") + ";");
-        }
-        // --- 进行DOM注入 ---
-        if (els.length > 0) {
-            for (let it of els) {
-                out.splice(0, 0, `var el_${it}=document.querySelector("[name='${it}']");`);
-            }
+        for (let k in vars) {
+            out.splice(0, 0, "var " + vars[k] + ";");
         }
         // --- 进行函数注入 ---
         for (let funcName of funs) {
@@ -240,7 +313,7 @@ class ComputeBasic {
             out.splice(0, 0, `var ${funcName}=${func.toString()};`);
         }
         // --- 导出 ---
-        if (opt && opt.string === true) {
+        if (opt.outType === "string") {
             return out.join("");
         } else {
             try {
@@ -252,6 +325,21 @@ class ComputeBasic {
         }
     }
 
+    /**
+     * --- Compile to string
+     * @param code cb code
+     */
+    public compileToString(code: string): string {
+        return this.compile(code, {
+            outType: "string"
+        }) || "";
+    }
+
+    /**
+     * --- show error alert ---
+     * @param code error code
+     * @param tr tr object
+     */
     private _error(code: number, tr: Abstracts.TokenRefer) {
         if (tr.token) {
             alert(`${this._lang.error}:\n${this._lang.code}: ${code}\n${this._lang.message}: ${this._lang.codeMessage[code]}\n${this._lang.word}：${tr.token.text}\n${this._lang.row}: ${tr.row}\n${this._lang.col}: ${tr.col}`);
